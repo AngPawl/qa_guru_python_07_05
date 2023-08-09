@@ -21,7 +21,9 @@ def test_open():
     browser.element('[class="react-datepicker__year-select"]').click().element(
         'option[value = "2000"]'
     ).click()
-    browser.element('[aria-label="Choose Saturday, January 1st, 2000"]').click()
+    browser.element(
+        '[class="react-datepicker__day react-datepicker__day--001 react-datepicker__day--weekend"]'
+    ).click()
 
     browser.element('#subjectsInput').type('computer').press_tab()
 
