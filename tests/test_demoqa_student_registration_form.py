@@ -1,64 +1,82 @@
 import os
 from selene import browser, command, have
+import tests
 
 
-def test_open():
+def test_successful_student_registration_form():
     browser.open('/automation-practice-form')
-    browser.element('#fixedban').perform(command.js.remove)
+    browser.all('[id^=google_ads][id$=container__]').with_(timeout=10).wait_until(
+        have.size_greater_than_or_equal(3)
+    )
+    browser.all('[id^=google_ads][id$=container__]').perform(command.js.remove)
 
+    # When
     browser.element('#firstName').type('John')
     browser.element('#lastName').type('Doe')
     browser.element('#userEmail').type('test_email.demoqa@test.com')
 
-    browser.element('#genterWrapper [for="gender-radio-1"]').click()
+    browser.all('[name=gender]').element_by(have.value('Male')).perform(
+        command.js.click
+    )
 
     browser.element('#userNumber').type('8800111111')
 
     browser.element('#dateOfBirthInput').perform(command.js.scroll_into_view).click()
-    browser.element('[class="react-datepicker__month-select"]').click().element(
-        'option[value = "0"]'
+    browser.element('.react-datepicker__month-select').all('option').element_by(
+        have.exact_text('January')
     ).click()
-    browser.element('[class="react-datepicker__year-select"]').click().element(
-        'option[value = "2000"]'
+
+    browser.element('.react-datepicker__year-select').all('option').element_by(
+        have.exact_text('2000')
     ).click()
-    browser.element('.react-datepicker__day--001').click()
+    browser.element(
+        f'.react-datepicker__day--00{1}:not(.react-datepicker__day--outside-month)'
+    ).click()
 
     browser.element('#subjectsInput').type('computer').press_tab()
 
-    browser.element('#hobbiesWrapper [for="hobbies-checkbox-1"]').perform(
-        command.js.scroll_into_view
-    ).click()
+    browser.all('[id^=hobbies][type=checkbox]+label').element_by(
+        have.exact_text('Sports')
+    ).perform(command.js.scroll_into_view).click()
 
-    browser.element('#uploadPicture').send_keys(
-        os.path.abspath('resources/student.png')
+    browser.element('#uploadPicture').set_value(
+        os.path.abspath(
+            os.path.join(os.path.dirname(tests.__file__), 'resources/student.png')
+        )
     )
 
     browser.element('#currentAddress').type(
         '42 Best street, suite 1, Dallas, TX, 11111'
     ).press_tab()
 
-    browser.element('#stateCity-wrapper #state').click().element('input').type(
-        'NCR'
-    ).press_tab()
+    browser.element('#state').click()
+    browser.all('[id^=react-select][id*=option]').element_by(
+        have.exact_text('NCR')
+    ).click()
 
-    browser.element('#stateCity-wrapper #city').click().element('input').type(
-        'Delhi'
-    ).press_tab()
+    browser.element('#city').click()
+    browser.all('[id^=react-select][id*=option]').element_by(
+        have.exact_text('Delhi')
+    ).click()
 
     browser.element('#submit').perform(command.js.click)
 
+    # Then
     browser.element('#example-modal-sizes-title-lg').should(
         have.text('Thanks for submitting the form')
     )
-    browser.element('.table').should(have.text('John Doe'))
-    browser.element('.table').should(have.text('test_email.demoqa@test.com'))
-    browser.element('.table').should(have.text('Male'))
-    browser.element('.table').should(have.text('8800111111'))
-    browser.element('.table').should(have.text('01 January,2000'))
-    browser.element('.table').should(have.text('Computer Science'))
-    browser.element('.table').should(have.text('Sports'))
-    browser.element('.table').should(have.text('student.png'))
-    browser.element('.table').should(
-        have.text('42 Best street, suite 1, Dallas, TX, 11111')
+
+    browser.element('.table').all('td').even.should(
+        have.exact_texts(
+            'John Doe',
+            'test_email.demoqa@test.com',
+            'Male',
+            '8800111111',
+            '01 January,2000',
+            'Computer Science',
+            'Sports',
+            'student.png',
+            '42 Best street, suite 1, Dallas, TX, 11111',
+            'NCR Delhi',
+        )
     )
-    browser.element('.table').should(have.text('NCR Delhi'))
