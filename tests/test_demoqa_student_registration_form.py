@@ -62,7 +62,7 @@ def test_successful_student_registration_form():
     browser.element('#submit').perform(command.js.click)
 
     # Then
-    browser.element('#example-modal-sizes-title-lg').should(
+    browser.element('.modal-header>.modal-title').should(
         have.text('Thanks for submitting the form')
     )
 
