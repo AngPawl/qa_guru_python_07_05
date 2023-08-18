@@ -9,19 +9,20 @@ def test_successful_student_registration_form():
         have.size_greater_than_or_equal(3)
     )
     browser.all('[id^=google_ads][id$=container__]').perform(command.js.remove)
+    browser.execute_script(
+        'document.querySelector(".body-height").style.transform = "scale(.8)"'
+    )
 
     # When
     browser.element('#firstName').type('John')
     browser.element('#lastName').type('Doe')
     browser.element('#userEmail').type('test_email.demoqa@test.com')
 
-    browser.all('[name=gender]').element_by(have.value('Male')).perform(
-        command.js.click
-    )
+    browser.all('[name=gender]').element_by(have.value('Male')).element('..').click()
 
     browser.element('#userNumber').type('8800111111')
 
-    browser.element('#dateOfBirthInput').perform(command.js.scroll_into_view).click()
+    browser.element('#dateOfBirthInput').click()
     browser.element('.react-datepicker__month-select').all('option').element_by(
         have.exact_text('January')
     ).click()
@@ -37,7 +38,7 @@ def test_successful_student_registration_form():
 
     browser.all('[id^=hobbies][type=checkbox]+label').element_by(
         have.exact_text('Sports')
-    ).perform(command.js.scroll_into_view).click()
+    ).click()
 
     browser.element('#uploadPicture').set_value(
         os.path.abspath(
